@@ -41,7 +41,7 @@ public class PersistManager {
 
   private static final String PROP_IMPORT_FILES_PATTERNS = SYSTEM_PROP_PREFIX + "persist.importFile.patterns";
   private static final String DEFAULT_IMPORT_FILES_PATTERNS = 
-          "^((?!\\/_delta_log\\/).)*$"; // skip "Delta Lake" log files
+          "^((?!^(\\/)?_delta_log\\/).)*$"; // skip "Delta Lake" log files
 
   private final String[] importFilesPatterns;
 
@@ -772,11 +772,11 @@ public class PersistManager {
    * @param matchStr The regular expression to use on the string after prefix
    * @return list containing the matching entries
    */
-  private ArrayList<String> matchPattern(String prefix, ArrayList<String> fileList, String matchStr){
+  ArrayList<String> matchPattern(String prefix, ArrayList<String> fileList, String matchStr){
     ArrayList<String> result = new ArrayList<>();
     Pattern pattern = Pattern.compile(matchStr);
     for (String s : fileList) {
-      Matcher matcher = pattern.matcher(afterPrefix(s,prefix));
+      Matcher matcher = pattern.matcher(afterPrefix(s, prefix));
       if (matcher.find()) {
         result.add(s);
       }
