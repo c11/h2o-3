@@ -59,7 +59,7 @@ public class GamMojoModelTest {
       // test for binomial
       String[] ignoredCols = new String[]{"C3", "C4", "C5", "C6", "C7", "C8", "C9", "C10", "C11", "C12", "C13", "C14",
               "C15", "C16", "C17", "C18", "C19", "C20"};
-      String[][] gamCols = new String[][]{{"C11", "C12", "C13"}};
+      String[][] gamCols = new String[][]{{"C11"}, {"C12"}, {"C13"}};
       Frame trainBinomial = Scope.track(massageFrame(parse_test_file("smalldata/glm_test/binomial_20_cols_10KRows.csv"),
               binomial));
       DKV.put(trainBinomial);
@@ -85,7 +85,7 @@ public class GamMojoModelTest {
     try {
       String[] ignoredCols = new String[]{"C3", "C4", "C5", "C6", "C7", "C8", "C9", "C10", "C11", "C12", "C13", "C14",
               "C15", "C16", "C17", "C18", "C19", "C20"};
-      String[][] gamCols = new String[][]{{"C11", "C12", "C13"}};
+      String[][] gamCols = new String[][]{{"C11"}, {"C12"}, {"C13"}};
       Frame trainGaussian = Scope.track(massageFrame(parse_test_file("smalldata/glm_test/gaussian_20cols_10000Rows.csv"), gaussian));
       DKV.put(trainGaussian);
       GAMModel gaussianmodel = getModel(gaussian,
@@ -111,7 +111,7 @@ public class GamMojoModelTest {
     try {
       // multinomial
       String[] ignoredCols = new String[]{"C3", "C4", "C5", "C6", "C7", "C8", "C9", "C10"};
-      String[][] gamCols = new String[][]{{"C6", "C7", "C8"}};
+      String[][] gamCols = new String[][]{{"C6"}, {"C7"}, {"C8"}};
       Frame trainMultinomial = Scope.track(massageFrame(parse_test_file("smalldata/glm_test/multinomial_10_classes_10_cols_10000_Rows_train.csv"), multinomial));
       DKV.put(trainMultinomial);
       GAMModel multinomialModel = getModel(multinomial,

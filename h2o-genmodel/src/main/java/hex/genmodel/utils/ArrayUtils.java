@@ -56,6 +56,24 @@ public class ArrayUtils {
     return cumsumR;
   }
 
+  public static int[] subtract(final int[] from, int val ) {
+    int arryLen = from.length;
+    int[] cumsumR = new int[arryLen];
+    for (int index = 0; index < arryLen; index++) {
+      cumsumR[index] = from[index]-val;
+    }
+    return cumsumR;
+  }
+
+  public static int[] subtract(final int[] from, int[] val ) {
+    int arryLen = from.length;
+    int[] cumsumR = new int[arryLen];
+    for (int index = 0; index < arryLen; index++) {
+      cumsumR[index] = from[index]-val[index];
+    }
+    return cumsumR;
+  }
+
   /**
    * Check to see if a column is a boolean column.  A boolean column should contains only two
    * levels and the string describing the domains should be true/false

@@ -33,13 +33,22 @@ public abstract class GamMojoModelBase extends MojoModel implements ConverterFac
   double[][] _beta_multinomial_no_center; // coefficients not centered for multinomial/ordinal
   double[][] _beta_multinomial_center; // coefficients not centered for multinomial/ordinal
   DistributionFamily _family;
-  String[] _gam_columns;
+  String[][] _gam_columns;
+  String[][] _gam_columns_sorted;
+  int[] _d;
+  int[] _m;
+  int[] _M;
+  int[] _gamPredSize;
   int _num_gam_columns;
   int[] _bs;
+  int[] _bs_sorted;
   int[] _num_knots;
-  double[][] _knots;
+  int[] _num_knots_sorted;
+  int[] _num_knots_TP;
+  double[][][] _knots;
   double[][][] _binvD;
   double[][][] _zTranspose;
+  double[][][] _zTransposeCS;
   String[][] _gamColNames;  // expanded gam column names
   String[][] _gamColNamesCenter;
   String[] _names_no_centering; // column names of features with no centering
@@ -51,6 +60,9 @@ public abstract class GamMojoModelBase extends MojoModel implements ConverterFac
   double[][] _hj;   // difference between knot values
   int _numExpandedGamCols; // number of expanded gam columns
   int _lastClass;
+  int[][][] _allPolyBasisList;
+  int _num_TP_col;
+  int _num_CS_col;
   
   GamMojoModelBase(String[] columns, String[][] domains, String responseColumn) {
     super(columns, domains, responseColumn);
@@ -65,11 +77,11 @@ public abstract class GamMojoModelBase extends MojoModel implements ConverterFac
   }
   
   void init() {
-    _basisVals = new double[_gam_columns.length][];
-    _hj = new double[_gam_columns.length][];
-    for (int ind=0; ind < _num_gam_columns; ind++) {
-      _basisVals[ind] = new double[_num_knots[ind]];
-      _hj[ind] = ArrayUtils.eleDiff(_knots[ind]);
+    _basisVals = new double[_num_CS_col][]; // for cubic spline smoothers only
+    _hj = new double[_num_CS_col][];
+    for (int ind=0; ind < _num_CS_col; ind++) {
+      _basisVals[ind] = new double[_num_knots_sorted[ind]];
+      _hj[ind] = ArrayUtils.eleDiff(_knots[ind][0]);
     }
     _lastClass = _nclasses - 1;
   }
@@ -150,20 +162,20 @@ public abstract class GamMojoModelBase extends MojoModel implements ConverterFac
     double[] dataWithGamifiedColumns = nanArray(_totFeatureSize);
     System.arraycopy(rawData, 0, dataWithGamifiedColumns, 0, dataIndEnd);
     for (int cind = 0; cind < _num_gam_columns; cind++) {
-      if (_bs[cind] == 0) { // to generate basis function values for cubic regression spline
-        Object dataObject = rowData.get(_gam_columns[cind]);
+      if (_bs_sorted[cind] == 0) { // to generate basis function values for cubic regression spline
+        Object dataObject = rowData.get(_gam_columns_sorted[cind]);
         double gam_col_data = Double.NaN;
         if (dataObject == null) {  // NaN, skip column gami
-          dataIndEnd += _num_knots[cind];
+          dataIndEnd += _num_knots_sorted[cind];
           continue;
         } else
           gam_col_data = (dataObject instanceof String) ? Double.parseDouble((String) dataObject) : (double) dataObject;
-        GamUtilsCubicRegression.expandOneGamCol(gam_col_data, _binvD[cind], _basisVals[cind], _hj[cind], _knots[cind]);
+        GamUtilsCubicRegression.expandOneGamCol(gam_col_data, _binvD[cind], _basisVals[cind], _hj[cind], _knots[cind][0]);
       } else {
         throw new IllegalArgumentException("spline type not implemented!");
       }
-      System.arraycopy(_basisVals[cind], 0, dataWithGamifiedColumns, dataIndEnd, _num_knots[cind]); // copy expanded gam to rawData
-      dataIndEnd += _num_knots[cind]; 
+      System.arraycopy(_basisVals[cind], 0, dataWithGamifiedColumns, dataIndEnd, _num_knots_sorted[cind]); // copy expanded gam to rawData
+      dataIndEnd += _num_knots_sorted[cind]; 
     }
     return dataWithGamifiedColumns;
   }

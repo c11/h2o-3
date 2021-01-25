@@ -249,8 +249,7 @@ public class GAM extends ModelBuilder<GAMModel, GAMModel.GAMParameters, GAMModel
     if ((_parms._bs != null) && (_parms._gam_columns.length != _parms._bs.length))  // check length
       error("gam colum number", "Number of gam columns implied from _bs and _gam_columns do not " +
               "match.");
-    if (_thinPlateSmoothersWithKnotsNum > 0)
-      setThinPlateParameters(_parms, _thinPlateSmoothersWithKnotsNum); // set the m, M for thin plate regression smoothers
+    setGamPredSize(_parms, _cubicSplineNum);
     checkOrChooseNumKnots(); // check valid num_knot assignment or choose num_knots
     if ((_parms._num_knots != null) && (_parms._num_knots.length != _parms._gam_columns.length))
       error("gam colum number", "Number of gam columns implied from _num_knots and _gam_columns do" +
@@ -262,6 +261,8 @@ public class GAM extends ModelBuilder<GAMModel, GAMModel.GAMParameters, GAMModel
     }
     _knots = generateKnotsFromKeys(); // generate knots and verify that they are given correctly
     sortGAMParameters(_parms, _cubicSplineNum, _thinPlateSmoothersWithKnotsNum); // move cubic spline to the front and thin plate to the back
+    if (_thinPlateSmoothersWithKnotsNum > 0)
+      setThinPlateParameters(_parms, _thinPlateSmoothersWithKnotsNum); // set the m, M for thin plate regression smoothers
     checkThinPlateParams();
     if (_parms._saveZMatrix && ((_train.numCols() - 1 + _parms._num_knots.length) < 2))
       error("_saveZMatrix", "can only be enabled if we number of predictors plus" +
@@ -585,7 +586,7 @@ public class GAM extends ModelBuilder<GAMModel, GAMModel.GAMParameters, GAMModel
           _gamColNames[index] = new String[kPlusM];
           _gamColNamesCenter[index] = new String[numKnotsM1];
           _gamColMeans[index] = new double[kPlusM];
-          _allPolyBasisList[thinPlateInd] = new int[_parms._M[thinPlateInd]][_parms._gamPredSize[thinPlateInd]];
+          _allPolyBasisList[thinPlateInd] = new int[_parms._M[thinPlateInd]][_parms._gamPredSize[index]];
           generateGamColumn[index] = new ThinPlateRegressionSmootherWithKnots(predictVec, _parms, index, _knots[index], 
                   thinPlateInd++);
         }
